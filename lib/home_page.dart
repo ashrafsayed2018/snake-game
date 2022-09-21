@@ -37,6 +37,21 @@ class _HomePageState extends State<HomePage> {
       setState(() {
         // move the snake
         moveSnake();
+
+        // if game is over
+        if (isGameOver()) {
+          // cancel the timer
+          timer.cancel();
+          // show message to the user
+          showDialog(
+              context: context,
+              builder: (context) {
+                return const AlertDialog(
+                  title: Text("game is over"),
+                  content: Text("current score: "),
+                );
+              });
+        }
       });
     });
   }
@@ -121,6 +136,25 @@ class _HomePageState extends State<HomePage> {
       // REMOVE THE TILE FROM THE SNAKE
 
       snakePostion.removeAt(0);
+    }
+  }
+
+  // is game over
+
+  bool isGameOver() {
+    // the game is over when snake is run into itself
+    // this accurs when there is duplicate position in snake position list
+
+    // the list is the body of the snake without the last snake positon
+
+    List<int> snakeBody = snakePostion.sublist(0, snakePostion.length - 1);
+
+    // check if the last snake positon index [head] is included in snake body if true the sanke hit itself and game is over
+
+    if (snakeBody.contains(snakePostion.last)) {
+      return true;
+    } else {
+      return false;
     }
   }
 
