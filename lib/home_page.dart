@@ -5,6 +5,8 @@ import 'package:snake_game/widget/blank_pixel.dart';
 import 'package:snake_game/widget/food_pixel.dart';
 import 'package:snake_game/widget/snake_pixel.dart';
 
+enum snakeDirection { DOWN, UP, LEFT, RIGHT }
+
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
 
@@ -23,19 +25,101 @@ class _HomePageState extends State<HomePage> {
   // food postion
   int foodPosition = 50;
 
+  // snake direction is initally to the right
+
+  var currentDirection = snakeDirection.RIGHT;
+
   // start the game when start button is clicked
 
   void startGame() {
-    Timer.periodic(const Duration(milliseconds: 150), (timer) {
+    Timer.periodic(const Duration(milliseconds: 400), (timer) {
       setState(() {
-        // add head to the sanke
-
-        snakePostion.add(snakePostion.last + 1);
-
-        // remove the tail of the sanke
-        snakePostion.removeAt(0);
+        moveSnake();
       });
     });
+  }
+
+  void moveSnake() {
+    switch (currentDirection) {
+      case snakeDirection.RIGHT:
+        {
+          // ADD HEAD TO THE SANKE
+
+          // if the snake is at the right wall , we need to adjust
+
+          if (snakePostion.last % rowSize == 9) {
+            snakePostion.add(snakePostion.last + 1 - rowSize);
+          } else {
+            snakePostion.add(snakePostion.last + 1);
+          }
+
+          // REMOVE THE TILE FROM THE SNAKE
+
+          snakePostion.removeAt(0);
+        }
+
+        break;
+      case snakeDirection.LEFT:
+        {
+          // ADD HEAD TO THE SANKE
+
+          // if the snake head in the left wall , we need to adjust
+
+          if (snakePostion.last % rowSize == 0) {
+            snakePostion.add(snakePostion.last - 1 + rowSize);
+          } else {
+            snakePostion.add(snakePostion.last - 1);
+          }
+
+          // REMOVE THE TILE FROM THE SNAKE
+
+          snakePostion.removeAt(0);
+        }
+
+        break;
+
+      case snakeDirection.UP:
+        {
+          // ADD HEAD TO THE SANKE
+
+          // if the snake head in the top wall , we need to adjust
+
+          if (snakePostion.last < rowSize) {
+            snakePostion
+                .add(snakePostion.last - rowSize + totalNumberOfSquares);
+          } else {
+            snakePostion.add(snakePostion.last - rowSize);
+          }
+
+          // REMOVE THE TILE FROM THE SNAKE
+
+          snakePostion.removeAt(0);
+        }
+
+        break;
+
+      case snakeDirection.DOWN:
+        {
+          // ADD HEAD TO THE SANKE
+
+          // if the snake head in the bottom wall , we need to adjust
+
+          if (snakePostion.last + rowSize > totalNumberOfSquares) {
+            snakePostion
+                .add(snakePostion.last + rowSize - totalNumberOfSquares);
+          } else {
+            snakePostion.add(snakePostion.last + rowSize);
+          }
+
+          // REMOVE THE TILE FROM THE SNAKE
+
+          snakePostion.removeAt(0);
+        }
+
+        break;
+
+      default:
+    }
   }
 
   @override
@@ -53,20 +137,40 @@ class _HomePageState extends State<HomePage> {
             Expanded(
               flex: 3,
               child: SizedBox(
-                child: GridView.builder(
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: rowSize,
-                  ),
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: totalNumberOfSquares,
-                  itemBuilder: (BuildContext context, int index) {
-                    if (snakePostion.contains(index)) {
-                      return const SnakePixel();
-                    } else if (foodPosition == index) {
-                      return const FoodPixel();
+                child: GestureDetector(
+                  onVerticalDragUpdate: (details) {
+                    if (details.delta.dy > 0 &&
+                        currentDirection != snakeDirection.UP) {
+                      currentDirection = snakeDirection.DOWN;
+                    } else if (details.delta.dy < 0 &&
+                        currentDirection != snakeDirection.DOWN) {
+                      currentDirection = snakeDirection.UP;
                     }
-                    return const BlankPixel();
                   },
+                  onHorizontalDragUpdate: (details) {
+                    if (details.delta.dx > 0 &&
+                        currentDirection != snakeDirection.LEFT) {
+                      currentDirection = snakeDirection.RIGHT;
+                    } else if (details.delta.dx < 0 &&
+                        currentDirection != snakeDirection.RIGHT) {
+                      currentDirection = snakeDirection.LEFT;
+                    }
+                  },
+                  child: GridView.builder(
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: rowSize,
+                    ),
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: totalNumberOfSquares,
+                    itemBuilder: (BuildContext context, int index) {
+                      if (snakePostion.contains(index)) {
+                        return const SnakePixel();
+                      } else if (foodPosition == index) {
+                        return const FoodPixel();
+                      }
+                      return const BlankPixel();
+                    },
+                  ),
                 ),
               ),
             ),
