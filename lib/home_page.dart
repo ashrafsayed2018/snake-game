@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:snake_game/widget/blank_pixel.dart';
@@ -34,9 +35,17 @@ class _HomePageState extends State<HomePage> {
   void startGame() {
     Timer.periodic(const Duration(milliseconds: 400), (timer) {
       setState(() {
+        // move the snake
         moveSnake();
       });
     });
+  }
+
+  void eatFood() {
+    // making sure the food is not where the snake is
+    while (snakePostion.contains(foodPosition)) {
+      foodPosition = Random().nextInt(totalNumberOfSquares);
+    }
   }
 
   void moveSnake() {
@@ -52,10 +61,6 @@ class _HomePageState extends State<HomePage> {
           } else {
             snakePostion.add(snakePostion.last + 1);
           }
-
-          // REMOVE THE TILE FROM THE SNAKE
-
-          snakePostion.removeAt(0);
         }
 
         break;
@@ -70,10 +75,6 @@ class _HomePageState extends State<HomePage> {
           } else {
             snakePostion.add(snakePostion.last - 1);
           }
-
-          // REMOVE THE TILE FROM THE SNAKE
-
-          snakePostion.removeAt(0);
         }
 
         break;
@@ -90,10 +91,6 @@ class _HomePageState extends State<HomePage> {
           } else {
             snakePostion.add(snakePostion.last - rowSize);
           }
-
-          // REMOVE THE TILE FROM THE SNAKE
-
-          snakePostion.removeAt(0);
         }
 
         break;
@@ -110,15 +107,20 @@ class _HomePageState extends State<HomePage> {
           } else {
             snakePostion.add(snakePostion.last + rowSize);
           }
-
-          // REMOVE THE TILE FROM THE SNAKE
-
-          snakePostion.removeAt(0);
         }
 
         break;
 
       default:
+    }
+
+    if (snakePostion.last == foodPosition) {
+      // snake is eating the food
+      eatFood();
+    } else {
+      // REMOVE THE TILE FROM THE SNAKE
+
+      snakePostion.removeAt(0);
     }
   }
 
