@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:snake_game/widget/blank_pixel.dart';
 import 'package:snake_game/widget/food_pixel.dart';
@@ -20,6 +22,22 @@ class _HomePageState extends State<HomePage> {
   List<int> snakePostion = [0, 1, 2];
   // food postion
   int foodPosition = 50;
+
+  // start the game when start button is clicked
+
+  void startGame() {
+    Timer.periodic(const Duration(milliseconds: 150), (timer) {
+      setState(() {
+        // add head to the sanke
+
+        snakePostion.add(snakePostion.last + 1);
+
+        // remove the tail of the sanke
+        snakePostion.removeAt(0);
+      });
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -34,7 +52,7 @@ class _HomePageState extends State<HomePage> {
             // game grid
             Expanded(
               flex: 3,
-              child: Container(
+              child: SizedBox(
                 child: GridView.builder(
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: rowSize,
@@ -54,11 +72,11 @@ class _HomePageState extends State<HomePage> {
             ),
             // play button
             Expanded(
-              child: Container(
+              child: SizedBox(
                 child: Center(
                   child: MaterialButton(
                     color: Colors.pink,
-                    onPressed: () {},
+                    onPressed: startGame,
                     child: const Text("Play"),
                   ),
                 ),
