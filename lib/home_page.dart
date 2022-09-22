@@ -201,93 +201,102 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    // get the screen width
+
+    double screenWidth = MediaQuery.of(context).size.width;
+    double screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
         backgroundColor: Colors.black,
-        body: Column(
-          children: [
-            // high scores
+        body: Container(
+          width: screenWidth > 400 ? 400 : screenWidth,
+          margin: EdgeInsets.symmetric(
+              horizontal: screenWidth > 400 ? (screenWidth - 400) / 2 : 0),
+          child: Column(
+            children: [
+              // high scores
 
-            Expanded(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Text("Current Score"),
-                      // user current score
-                      Text(
-                        currentScore.toString(),
-                        style: const TextStyle(
-                          fontSize: 36,
-                          color: Colors.green,
+              Expanded(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Text("Current Score"),
+                        // user current score
+                        Text(
+                          currentScore.toString(),
+                          style: const TextStyle(
+                            fontSize: 36,
+                            color: Colors.green,
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                  // high scores top 5 or top 10
-                  const Text(
-                    "high scores",
-                    style: TextStyle(fontSize: 36),
-                  )
-                ],
-              ),
-            ),
-            // game grid
-            Expanded(
-              flex: 3,
-              child: SizedBox(
-                child: GestureDetector(
-                  onVerticalDragUpdate: (details) {
-                    if (details.delta.dy > 0 &&
-                        currentDirection != snakeDirection.UP) {
-                      currentDirection = snakeDirection.DOWN;
-                    } else if (details.delta.dy < 0 &&
-                        currentDirection != snakeDirection.DOWN) {
-                      currentDirection = snakeDirection.UP;
-                    }
-                  },
-                  onHorizontalDragUpdate: (details) {
-                    if (details.delta.dx > 0 &&
-                        currentDirection != snakeDirection.LEFT) {
-                      currentDirection = snakeDirection.RIGHT;
-                    } else if (details.delta.dx < 0 &&
-                        currentDirection != snakeDirection.RIGHT) {
-                      currentDirection = snakeDirection.LEFT;
-                    }
-                  },
-                  child: GridView.builder(
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: rowSize,
+                      ],
                     ),
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: totalNumberOfSquares,
-                    itemBuilder: (BuildContext context, int index) {
-                      if (snakePostion.contains(index)) {
-                        return const SnakePixel();
-                      } else if (foodPosition == index) {
-                        return const FoodPixel();
+                    // high scores top 5 or top 10
+                    const Text(
+                      "high scores",
+                      style: TextStyle(fontSize: 36),
+                    )
+                  ],
+                ),
+              ),
+              // game grid
+              Expanded(
+                flex: 3,
+                child: SizedBox(
+                  child: GestureDetector(
+                    onVerticalDragUpdate: (details) {
+                      if (details.delta.dy > 0 &&
+                          currentDirection != snakeDirection.UP) {
+                        currentDirection = snakeDirection.DOWN;
+                      } else if (details.delta.dy < 0 &&
+                          currentDirection != snakeDirection.DOWN) {
+                        currentDirection = snakeDirection.UP;
                       }
-                      return const BlankPixel();
                     },
+                    onHorizontalDragUpdate: (details) {
+                      if (details.delta.dx > 0 &&
+                          currentDirection != snakeDirection.LEFT) {
+                        currentDirection = snakeDirection.RIGHT;
+                      } else if (details.delta.dx < 0 &&
+                          currentDirection != snakeDirection.RIGHT) {
+                        currentDirection = snakeDirection.LEFT;
+                      }
+                    },
+                    child: GridView.builder(
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: rowSize,
+                      ),
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: totalNumberOfSquares,
+                      itemBuilder: (BuildContext context, int index) {
+                        if (snakePostion.contains(index)) {
+                          return const SnakePixel();
+                        } else if (foodPosition == index) {
+                          return const FoodPixel();
+                        }
+                        return const BlankPixel();
+                      },
+                    ),
                   ),
                 ),
               ),
-            ),
-            // play button
-            Expanded(
-              child: SizedBox(
-                child: Center(
-                  child: MaterialButton(
-                    color: gameHasStarted ? Colors.grey : Colors.pink,
-                    onPressed: gameHasStarted ? () {} : startGame,
-                    child: const Text("Play"),
+              // play button
+              Expanded(
+                child: SizedBox(
+                  child: Center(
+                    child: MaterialButton(
+                      color: gameHasStarted ? Colors.grey : Colors.pink,
+                      onPressed: gameHasStarted ? () {} : startGame,
+                      child: const Text("Play"),
+                    ),
                   ),
                 ),
-              ),
-            )
-          ],
+              )
+            ],
+          ),
         ));
   }
 }
