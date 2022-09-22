@@ -20,11 +20,15 @@ class _HomePageState extends State<HomePage> {
 
   int rowSize = 10;
   int totalNumberOfSquares = 100;
+  bool gameHasStarted = false;
 
   // snak position
   List<int> snakePostion = [0, 1, 2];
   // food postion
-  int foodPosition = 50;
+  int foodPosition = 55;
+
+  // current score
+  int currentScore = 0;
 
   // snake direction is initally to the right
 
@@ -33,6 +37,7 @@ class _HomePageState extends State<HomePage> {
   // start the game when start button is clicked
 
   void startGame() {
+    gameHasStarted = true;
     Timer.periodic(const Duration(milliseconds: 400), (timer) {
       setState(() {
         // move the snake
@@ -46,9 +51,27 @@ class _HomePageState extends State<HomePage> {
           showDialog(
               context: context,
               builder: (context) {
-                return const AlertDialog(
-                  title: Text("game is over"),
-                  content: Text("current score: "),
+                return AlertDialog(
+                  title: const Text("game is over"),
+                  content: Column(
+                    children: [
+                      Text("current score: ${currentScore.toString()}"),
+                      const TextField(
+                        decoration: InputDecoration(hintText: "Enter name?"),
+                      ),
+                    ],
+                  ),
+                  actions: [
+                    MaterialButton(
+                      onPressed: () {
+                        submitScore();
+                        Navigator.pop(context);
+                        restartGame();
+                      },
+                      color: Colors.pink,
+                      child: const Text("Sumbit"),
+                    )
+                  ],
                 );
               });
         }
@@ -56,7 +79,13 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+  // submit the score to the firebase database
+  void submitScore() {
+    //
+  }
+
   void eatFood() {
+    currentScore++;
     // making sure the food is not where the snake is
     while (snakePostion.contains(foodPosition)) {
       foodPosition = Random().nextInt(totalNumberOfSquares);
@@ -158,6 +187,18 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  // game restart
+
+  restartGame() {
+    setState(() {
+      snakePostion = [0, 1, 2];
+    });
+    foodPosition = 55;
+    currentDirection = snakeDirection.RIGHT;
+    gameHasStarted = false;
+    currentScore = 0;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -167,7 +208,31 @@ class _HomePageState extends State<HomePage> {
             // high scores
 
             Expanded(
-              child: Container(),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text("Current Score"),
+                      // user current score
+                      Text(
+                        currentScore.toString(),
+                        style: const TextStyle(
+                          fontSize: 36,
+                          color: Colors.green,
+                        ),
+                      ),
+                    ],
+                  ),
+                  // high scores top 5 or top 10
+                  const Text(
+                    "high scores",
+                    style: TextStyle(fontSize: 36),
+                  )
+                ],
+              ),
             ),
             // game grid
             Expanded(
@@ -215,8 +280,8 @@ class _HomePageState extends State<HomePage> {
               child: SizedBox(
                 child: Center(
                   child: MaterialButton(
-                    color: Colors.pink,
-                    onPressed: startGame,
+                    color: gameHasStarted ? Colors.grey : Colors.pink,
+                    onPressed: gameHasStarted ? () {} : startGame,
                     child: const Text("Play"),
                   ),
                 ),
